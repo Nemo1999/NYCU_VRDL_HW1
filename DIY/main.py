@@ -5,6 +5,7 @@ import numpy as np
 import random
 import csv
 import torch
+import torch.nn as nn
 import torch.utils.data as td
 import torchvision as tv
 import torch.nn.functional as F
@@ -20,9 +21,12 @@ PRETRAINED = True
 
 random.seed(RANDOM_SEED)
 
+# create an output folder
+os.makedirs(OUT_DIR, exist_ok=True)
+
 
 # set hyper-parameters
-params = {'batch_size': 24, 'num_workers': 16}
+params = {'batch_size': 24, 'num_workers': 12}
 num_epochs = 100
 num_classes = 201
 
@@ -123,7 +127,9 @@ val_loader = td.DataLoader(
 test_loader = td.DataLoader(dataset=ds_eval, batch_size=1)
 
 # instantiate the model
-model = tv.models.resnet50(num_classes=num_classes, pretrained=PRETRAINED).to(DEVICE)
+model = tv.models.resnet50(pretrained=PRETRAINED)
+model.fc = nn.Linear(2048, num_classes)
+model = model.to(DEVICE)
 print(model)
 
 # instantiate optimizer and scheduler
