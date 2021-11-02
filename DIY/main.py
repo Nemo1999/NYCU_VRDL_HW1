@@ -106,7 +106,7 @@ ds_eval = my_custom_dataset.evalset(transform=transforms_eval)
 # set hyper-parameters
 params = {'batch_size': 24, 'num_workers': 8}
 num_epochs = 100
-num_classes = 200
+num_classes = 201
 
 # instantiate data loaders
 train_loader = td.DataLoader(
