@@ -1,6 +1,7 @@
 import os
+import sys
 import tqdm
-import numpy
+import numpy as np
 import random
 import csv
 import torch
@@ -8,17 +9,22 @@ import torch.utils.data as td
 import torchvision as tv
 import torch.nn.functional as F
 import torchvision.transforms.functional as TF
-import sklearn.model_selection as sksm
-
+import sklearn.model_selection as skms
+import sklearn.metrics as skmc
 import my_custom_dataset
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 OUT_DIR = './Results'
 RANDOM_SEED = 42
+PRETRAINED = True
 
 random.seed(RANDOM_SEED)
-#os.makedirs = (OUT_DIR, exist_ok=True)
 
+
+# set hyper-parameters
+params = {'batch_size': 24, 'num_workers': 16}
+num_epochs = 100
+num_classes = 201
 
 def get_model_desc(pretrained=False, num_classes=200, use_attention=False):
     """
@@ -103,11 +109,6 @@ ds_train = my_custom_dataset.trainset(transform=transforms_train)
 ds_val = my_custom_dataset.testset(transform=transforms_train)
 ds_eval = my_custom_dataset.evalset(transform=transforms_eval)
 
-# set hyper-parameters
-params = {'batch_size': 24, 'num_workers': 8}
-num_epochs = 100
-num_classes = 201
-
 # instantiate data loaders
 train_loader = td.DataLoader(
     dataset=ds_train,
@@ -122,16 +123,21 @@ val_loader = td.DataLoader(
 test_loader = td.DataLoader(dataset=ds_eval, batch_size=1)
 
 # instantiate the model
-model = tv.models.resnet50(num_classes=num_classes).to(DEVICE)
+model = tv.models.resnet50(num_classes=num_classes, pretrained=PRETRAINED).to(DEVICE)
 print(model)
 
 # instantiate optimizer and scheduler
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
-scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.95)
+if PRETRAINED :
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+    scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.95)
+else:
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.95)
+
 
 
 # generate model description string
-model_desc = get_model_desc(num_classes=num_classes)
+model_desc = get_model_desc(num_classes=num_classes, pretrained=PRETRAINED)
 
 # define the training loop
 best_snapshot_path = None
@@ -143,7 +149,7 @@ for epoch in range(num_epochs):
     # train the model
     model.train()
     train_loss = list()
-    for batch in train_loader:
+    for batch in tqdm.tqdm(train_loader,postfix=({"epoch":int(epoch)})):
         x, y = batch
 
         x = x.to(DEVICE)
@@ -181,7 +187,7 @@ for epoch in range(num_epochs):
             loss = F.cross_entropy(y_pred, y)
 
             # calculate the accuracy
-            acc = skms.accuracy_score([val.item() for val in y], [val.item() for val in y_pred.argmax(dim=-1)])
+            acc = skmc.accuracy_score([val.item() for val in y], [val.item() for val in y_pred.argmax(dim=-1)])
 
             val_loss.append(loss.item())
             val_acc.append(acc)
@@ -203,7 +209,7 @@ for epoch in range(num_epochs):
     scheduler.step()
 
     # print performance metrics
-    if (epoch == 0) or ((epoch + 1) % 10 == 0):
-        print('Epoch {} |> Train. loss: {:.4f} | Val. loss: {:.4f} | Val. acc: {:.4f}'.format(
-            epoch + 1, np.mean(train_loss), np.mean(val_loss), np.mean(val_acc))
+    if (epoch == 0) or ((epoch + 1) % 1 == 0):
+        sys.stdout.write('\rEpoch {} |> Train. loss: {:.4f} | Val. loss: {:.4f} | Val. acc: {:.4f}]\n'.format(
+            epoch + 1, np.mean(train_loss), np.mean(val_loss), np.mean(val_acc),flush=True)
         )
