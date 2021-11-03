@@ -2,7 +2,7 @@ from PIL import Image
 from os.path import join
 from torch.utils.data import Dataset
 
-def get_class_dicts( root='/home/nemo/VRDL2021/HW1_Fine_Grained/datasets/CUB'):
+def get_class_dicts(root):
     class2int = dict()
     int2class = dict()
     with open(join(root, 'classes.txt')) as f :
@@ -14,7 +14,7 @@ def get_class_dicts( root='/home/nemo/VRDL2021/HW1_Fine_Grained/datasets/CUB'):
         return class2int, int2class
 
 class trainset(Dataset):
-    def __init__(self, transform=None, root='/home/nemo/NYCU_VRDL_HW1/datasets/CUB'):
+    def __init__(self, transform=None, root='/home/nemo/VRDL2021/HW1_Fine_Grained/datasets/CUB'):
         self.root = root
         self.transform=transform
         self.class2int, self.int2class = get_class_dicts(root)
@@ -36,7 +36,7 @@ class trainset(Dataset):
 
 
 class testset(Dataset):
-    def __init__(self, transform=None, root='/home/nemo/NYCU_VRDL_HW1/datasets/CUB'):
+    def __init__(self, transform=None, root='/home/nemo/VRDL2021/HW1_Fine_Grained/datasets/CUB'):
         self.root = root
         self.transform=transform
         self.class2int, self.int2class = get_class_dicts(root)
@@ -60,7 +60,7 @@ class testset(Dataset):
         return img, label
 
 class evalset(Dataset):
-    def __init__(self, transform=None, root='/home/nemo/NYCU_VRDL_HW1/datasets/CUB'):
+    def __init__(self, transform=None, root='/home/nemo/VRDL2021/HW1_Fine_Grained/datasets/CUB'):
         self.root = root
         self.transform = transform
         self.class2int, self.int2class = get_class_dicts(root)
@@ -68,10 +68,10 @@ class evalset(Dataset):
         with open(join(root,'testing_img_order.txt')) as f:
             for file in f.readlines():
                 self.files.append(file.strip())
-    def __len__(self):
+        def __len__(self):
             return len(self.files)
-    def __getitem__(self, index):
-            img = Image.open(join(self.root,'testing_images',self.files[index]))
+        def __getitem__(self, index):
+            img = Image.open(join(self.rot,'testing_images',self.files[index]))
             if self.transform:
                 img = self.transform(img)
             return self.files[index], img
