@@ -407,6 +407,7 @@ def validate(val_loader, model, criterion):
 def evaluate(eval_loader, model, criterion):
     batch_time = AverageMeter()
     print("Evaluating Model !")
+    c2i, i2c = my_custom_dataset.get_class_dicts()
     # switch to evaluate mode
     model.eval()
 
@@ -435,7 +436,7 @@ def evaluate(eval_loader, model, criterion):
             batch_time.update(time.time() - end)
             end = time.time()
             # write entry into evaluation_result.txt file
-            f.write(f'{img_name} {eval_loader.int2class[pred.item()]}\n')
+            f.write(f'{img_name} {i2c[pred.item()]}\n')
             # print logs
             if i % args.print_freq == 0:
                 print('Test: [{0}/{1}]\t'
