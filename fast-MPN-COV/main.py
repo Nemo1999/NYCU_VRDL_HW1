@@ -298,7 +298,7 @@ def main():
         print("=> start evaluation")
         best_model = torch.load(model_file)
         model.load_state_dict(best_model['state_dict'])
-        validate(evaluate_loader, model, criterion)
+        evaluate(evaluate_loader, model, criterion)
 
 
 
@@ -417,7 +417,6 @@ def evaluate(eval_loader, model, criterion):
         for i, (img_name, input) in enumerate(eval_loader):
             if args.gpu is not None:
                 input = input.cuda(args.gpu, non_blocking=True)
-            target = target.cuda(args.gpu, non_blocking=True)
 
             # compute output
             ## modified by jiangtao xie
@@ -436,15 +435,14 @@ def evaluate(eval_loader, model, criterion):
             batch_time.update(time.time() - end)
             end = time.time()
             # write entry into evaluation_result.txt file
-            f.write(f'{img_name} {i2c[pred.item()]}\n')
+            f.write(f'{img_name[0]} {i2c[pred.item()]}\n')
             # print logs
             if i % args.print_freq == 0:
                 print('Test: [{0}/{1}]\t'
                       'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                       'Predicted Class: {classname}'.format(
                           i, len(eval_loader), batch_time=batch_time,
-                          classname=eval_loader.int2class[pred]
-                      ))
+                          classname=i2c[pred.item()]))
 
     return
 
