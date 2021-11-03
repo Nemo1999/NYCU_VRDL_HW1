@@ -31,7 +31,7 @@ arch=mpncovresnet50
 #CBP (compact bilinear pooling)
 #...
 #You can also add your own method in src/representation
-image_representation=GAvP
+image_representation=MPNCOV
 # short description of method
 description=mpnconv_resnet50_first_try
 #*********************************************
@@ -39,7 +39,7 @@ description=mpnconv_resnet50_first_try
 #*******************Dataset*******************
 #Choose the dataset folder
 benchmark=CUB
-datadir=/home/nemo/VRDL2021/HW1_Fine_Grained/datasets
+datadir=/home/nemo/NYCU_VRDL_HW1/datasets
 dataset=$datadir/$benchmark
 num_classes=201
 #*********************************************
@@ -49,7 +49,7 @@ num_classes=201
 # Freeze the layers before a certain layer.
 freeze_layer=0
 # Batch size
-batchsize=10
+batchsize=24
 # The number of total epochs for training
 epoch=40
 # The inital learning rate

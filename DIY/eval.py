@@ -78,6 +78,7 @@ model.load_state_dict(torch.load(args.model_path, map_location=DEVICE))
 true = list()
 pred = list()
 c2i, i2c = my_custom_dataset.get_class_dicts()
+model.eval()
 with torch.no_grad():
     with open(f'result{datetime.now().strftime("%m-%d-%Y__%H:%M:%S").replace(" ", "-")}.txt', "a") as f:
         for batch in tqdm(test_loader):
@@ -86,7 +87,7 @@ with torch.no_grad():
 
             # predict bird species
             y_pred = model(img)
-
-            _, pred = y_pred.topk(1, 1, True, True)
+            #print(y_pred)
+            pred = y_pred.argmax(dim=-1)
             #print(pred)
             f.write(f'{img_path[0]} {i2c[pred.item()]}\n')

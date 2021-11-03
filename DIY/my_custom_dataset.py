@@ -14,7 +14,7 @@ def get_class_dicts( root='/home/nemo/VRDL2021/HW1_Fine_Grained/datasets/CUB'):
         return class2int, int2class
 
 class trainset(Dataset):
-    def __init__(self, transform=None, root='/home/nemo/VRDL2021/HW1_Fine_Grained/datasets/CUB'):
+    def __init__(self, transform=None, root='/home/nemo/NYCU_VRDL_HW1/datasets/CUB'):
         self.root = root
         self.transform=transform
         self.class2int, self.int2class = get_class_dicts(root)
@@ -36,7 +36,7 @@ class trainset(Dataset):
 
 
 class testset(Dataset):
-    def __init__(self, transform=None, root='/home/nemo/VRDL2021/HW1_Fine_Grained/datasets/CUB'):
+    def __init__(self, transform=None, root='/home/nemo/NYCU_VRDL_HW1/datasets/CUB'):
         self.root = root
         self.transform=transform
         self.class2int, self.int2class = get_class_dicts(root)
@@ -60,7 +60,7 @@ class testset(Dataset):
         return img, label
 
 class evalset(Dataset):
-    def __init__(self, transform=None, root='/home/nemo/VRDL2021/HW1_Fine_Grained/datasets/CUB'):
+    def __init__(self, transform=None, root='/home/nemo/NYCU_VRDL_HW1/datasets/CUB'):
         self.root = root
         self.transform = transform
         self.class2int, self.int2class = get_class_dicts(root)
